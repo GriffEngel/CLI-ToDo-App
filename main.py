@@ -27,14 +27,16 @@ add_parser.add_argument(
 add_parser.add_argument(
     "status",
     help="Are you not started, in-progress, or done with the task?",
-    choices=["todo", "doing", "done"],
+    default="todo",
+    nargs="?",
+    choices=("todo", "doing", "done"),
 )
 
 # list args
 list_parser.add_argument(
     "status",
     help="Choose which status you would like to see all the tasks for",
-    choices=["todo", "doing", "done"],
+    choices=["todo", "doing", "done", "all", "in-progress"],
 )
 
 # delete args
@@ -43,7 +45,9 @@ delete_parser.add_argument(
 )
 
 # update args
-update_parser.add_argument("update_id", help="Task ID you would like to update")
+update_parser.add_argument(
+    "update_id", type=int, help="Task ID you would like to update"
+)
 update_parser.add_argument(
     "update_status", help="What status you would like to change the task to"
 )
@@ -87,12 +91,24 @@ def add_task():
     tasks.append(task)
 
     save_file(tasks)
+    print(f"Task added successfully (ID: {task_id})")
 
 
 # list tasks
 def list_tasks(command):
     tasks = load_tasks()
     print(f"{command}\n-------------------------")
+    if command == "all":
+        for task in tasks:
+            print(
+                f"ID: {task['id']}, {task['description']}, Status: {task['status']}, {task['created_at']}"
+            )
+    elif command == "in-progress":
+        for task in tasks:
+            if task["status"] == "todo" or task["status"] == "doing":
+                print(
+                    f"ID: {task['id']}, {task['description']}, Status: {task['status']}, {task['created_at']}"
+                )
     for task in tasks:
         if task["status"] == command:
             print(
@@ -109,14 +125,14 @@ def delete_task(task_id):
     save_file(tasks)
 
 
-# TODO: debug function
 # mark task as done or in progress
 def update_task(task_id, task_status):
     tasks = load_tasks()
     for task in tasks:
         if task["id"] == task_id:
             task["status"] = task_status
-    print(tasks)
+            save_file(tasks)
+    save_file(tasks)
 
 
 def main():
