@@ -11,7 +11,8 @@ parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(dest="command")
 add_parser = subparsers.add_parser("add", help="Add new task")
 list_parser = subparsers.add_parser(
-    "list", help="list tasks with the same status (todo, in-progress, done)"
+    "list",
+    help="list tasks with the same status (todo, in-progress, done)",
 )
 delete_parser = subparsers.add_parser(
     "delete", help="remove task from task list"
@@ -36,7 +37,7 @@ add_parser.add_argument(
 list_parser.add_argument(
     "status",
     help="Choose which status you would like to see all the tasks for",
-    choices=["todo", "doing", "done", "all", "in-progress"],
+    choices=("todo", "doing", "done", "all", "in-progress"),
 )
 
 # delete args
@@ -49,7 +50,8 @@ update_parser.add_argument(
     "update_id", type=int, help="Task ID you would like to update"
 )
 update_parser.add_argument(
-    "update_status", help="What status you would like to change the task to"
+    "update_status",
+    help="What status you would like to change the task to",
 )
 
 # arguments
@@ -72,57 +74,75 @@ def load_tasks(filename="tasks.json"):
 
 # save and write task to JSON file
 def save_file(task_list, filename="tasks.json"):
-    with open(filename, "w") as f:
-        json.dump(task_list, f, indent=4)
+    try:
+        with open(filename, "w") as f:
+            json.dump(task_list, f, indent=4)
+    except EOFError as e:
+        print(e, "Could not save file")
 
 
 # add new task
 def add_task():
-    tasks = load_tasks()
+    try:
+        tasks = load_tasks()
 
-    task_id = len(tasks) + 1
-    task = {
-        "id": task_id,
-        "description": args.description,
-        "status": args.status,
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-    }
-    tasks.append(task)
+        task_id = len(tasks) + 1
+        # prevent duplicate task IDs
+        for task in tasks:
+            if task["id"] == task_id:
+                task_id = len(tasks) + 2
 
-    save_file(tasks)
-    print(f"Task added successfully (ID: {task_id})")
+        task = {
+            "id": task_id,
+            "description": args.description,
+            "status": args.status,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+        tasks.append(task)
+
+        save_file(tasks)
+        print(f"Task added successfully (ID: {task_id})")
+    except Exception as e:
+        print("The error is: ", e)
 
 
 # list tasks
 def list_tasks(command):
-    tasks = load_tasks()
-    print(f"{command}\n-------------------------")
-    if command == "all":
-        for task in tasks:
-            print(
-                f"ID: {task['id']}, {task['description']}, Status: {task['status']}, {task['created_at']}"
-            )
-    elif command == "in-progress":
-        for task in tasks:
-            if task["status"] == "todo" or task["status"] == "doing":
+    try:
+        tasks = load_tasks()
+        print(f"{command}\n-------------------------")
+        if command == "all":
+            for task in tasks:
                 print(
                     f"ID: {task['id']}, {task['description']}, Status: {task['status']}, {task['created_at']}"
                 )
-    for task in tasks:
-        if task["status"] == command:
-            print(
-                f"ID: {task['id']}, Task: {task['description']}, {task['created_at']}"
-            )
+        elif command == "in-progress":
+            for task in tasks:
+                if task["status"] == "todo" or task["status"] == "doing":
+                    print(
+                        f"ID: {task['id']}, {task['description']}, Status: {task['status']}, {task['created_at']}"
+                    )
+        for task in tasks:
+            if task["status"] == command:
+                print(
+                    f"ID: {task['id']}, Task: {task['description']}, {task['created_at']}"
+                )
+    except Exception as e:
+        print("The error is: ", e)
 
 
 # delete task
 def delete_task(task_id):
-    tasks = load_tasks()
-    for task in tasks:
-        if task["id"] == task_id:
-            tasks.remove(task)
-    save_file(tasks)
+    try:
+        tasks = load_tasks()
+        for task in tasks:
+            if task["id"] == task_id:
+                tasks.remove(task)
+        save_file(tasks)
+    except Exception as e:
+        print("The error is: ", e)
 
 
 # mark task as done or in progress
