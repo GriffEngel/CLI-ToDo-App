@@ -59,7 +59,7 @@ args = parser.parse_args()
 
 
 # load tasks
-def load_tasks(filename="tasks.json"):
+def load_tasks(filename="tasks.json") -> list:
     try:
         # reads file tasks.json
         with open(filename, "r") as f:
@@ -73,7 +73,7 @@ def load_tasks(filename="tasks.json"):
 
 
 # save and write task to JSON file
-def save_file(task_list, filename="tasks.json"):
+def save_file(task_list, filename="~/tasks.json") -> json:
     try:
         with open(filename, "w") as f:
             json.dump(task_list, f, indent=4)
