@@ -141,6 +141,7 @@ def delete_task(task_id):
             if task["id"] == task_id:
                 tasks.remove(task)
         save_file(tasks)
+        print(f"Task ID: {task_id}, {task["description"]} successfully deleted")
     except Exception as e:
         print("The error is: ", e)
 
@@ -152,6 +153,7 @@ def update_task(task_id, task_status):
         if task["id"] == task_id:
             task["status"] = task_status
             save_file(tasks)
+            print(f"Task ID: {task_id}, '{task["description"]}' successfully updated to '{task_status}'")
     save_file(tasks)
 
 
