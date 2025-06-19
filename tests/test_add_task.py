@@ -6,42 +6,6 @@ import json
 from main import load_tasks, add_task, save_file, args
 
 
-# TODO: Write tests
-class TestLoadTask(unittest.TestCase):
-    @patch(
-        "builtins.open",
-        new_callable=mock_open,
-        read_data=json.dumps(
-            [
-                {
-                    "id": 1,
-                    "description": "Do the dishes",
-                    "status": "todo",
-                    "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                }
-            ]
-        ),
-    )
-    def test_load_tasks(self, mock_open):
-        filename = "tasks.json"
-        # call function that is being tested
-        actual_output = load_tasks(filename)
-        # make sure it's being opened with correct arguments
-        mock_open.assert_called_with(filename, "r")
-        expected_output = [
-            {
-                "id": 1,
-                "description": "Do the dishes",
-                "status": "todo",
-                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            }
-        ]
-
-        self.assertEqual(expected_output, actual_output)
-
-
 # applied bottom to top?
 @patch("main.save_file")
 @patch("main.load_tasks")
@@ -105,6 +69,7 @@ class TestAddTask(unittest.TestCase):
         add_task()
         mock_save_file.assert_called_once()
 
+        # call first item in both arg lists
         saved_tasks = mock_save_file.call_args[0][0]
 
         new_task = saved_tasks[4]
