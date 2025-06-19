@@ -86,11 +86,7 @@ def add_task():
     try:
         tasks = load_tasks()
 
-        task_id = len(tasks) + 1
-        # prevent duplicate task IDs
-        for task in tasks:
-            if task["id"] == task_id:
-                task_id = len(tasks) + 2
+        task_id = max(task["id"] for task in tasks) + 1 if tasks else 1
 
         task = {
             "id": task_id,
@@ -141,7 +137,9 @@ def delete_task(task_id):
             if task["id"] == task_id:
                 tasks.remove(task)
         save_file(tasks)
-        print(f"Task ID: {task_id}, {task["description"]} successfully deleted")
+        print(
+            f"Task ID: {task_id}, {task['description']} successfully deleted"
+        )
     except Exception as e:
         print("The error is: ", e)
 
@@ -153,7 +151,9 @@ def update_task(task_id, task_status):
         if task["id"] == task_id:
             task["status"] = task_status
             save_file(tasks)
-            print(f"Task ID: {task_id}, '{task["description"]}' successfully updated to '{task_status}'")
+            print(
+                f"Task ID: {task_id}, '{task['description']}' successfully updated to '{task_status}'"
+            )
     save_file(tasks)
 
 
