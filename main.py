@@ -8,13 +8,9 @@ from args import args
 # load tasks
 def load_tasks(filename="tasks.json"):
     try:
-        # reads file tasks.json
         with open(filename, "r") as f:
-            # loads json data in file
             tasks = json.load(f)
-            # returns data if tasks is a list, else returns a list
             return tasks if isinstance(tasks, list) else []
-    # handles errors by returning a list
     except (FileNotFoundError, json.JSONDecodeError):
         return []
 
@@ -51,19 +47,16 @@ def add_task():
     except Exception as e:
         print(f"Error adding task: {e}")
 
-
+# list tasks
 def list_tasks(command):
     try:
         tasks = load_tasks()
-        # check for empty list
         if not tasks:
             print("No tasks found")
             return
 
-        # print dividing line early
         print(f"{command}\n" + "-" * 25)
 
-        # define the filtered list first, then print it
         if command == "all":
             filtered_tasks = tasks
         elif command == "in-progress":
@@ -73,13 +66,11 @@ def list_tasks(command):
         else:
             filtered_tasks = [t for t in tasks if t["status"] == command]
 
-        # one common print statement
         for task in filtered_tasks:
             print(
                 f"ID: {task['id']}, Task: {task['description']}, Status: {task['status']}, {task['updated_at']}"
             )
 
-        # check if command has no filtered tasks
         if not filtered_tasks:
             print(f"No tasks found for {command}")
 
@@ -91,7 +82,6 @@ def list_tasks(command):
 def delete_task(task_id):
     try:
         tasks = load_tasks()
-        # access both index and value so pop() is usable
         for i, task in enumerate(tasks):
             if task["id"] == task_id:
                 deleted_task = tasks.pop(i)
@@ -135,9 +125,7 @@ def main():
         "update": lambda: update_task(args.update_id, args.update_status),
     }
     if args.command in commands:
-        result = commands[command]()
-        if result is None and args.command == "add":
-            print("Description is required for adding tasks")
+        result = commands[args.command]()
 
 
 if __name__ == "__main__":
