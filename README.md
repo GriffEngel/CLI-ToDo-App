@@ -1,4 +1,4 @@
-[# CLI ToDo -- A command line interface todo list](https://github.com/GriffEngel/CLI-ToDo-App)
+# [CLI ToDo -- A command line interface todo list](https://github.com/GriffEngel/CLI-ToDo-App)
 
 ## Adding a Task
 ### ``clitodo add <"description"> <status>``
