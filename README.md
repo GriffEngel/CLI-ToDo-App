@@ -2,10 +2,10 @@
 
 ## Adding a Task
 ### ``clitodo add <"description"> <status>``
-  ``clitodo add "Do this dishes" todo``
+  ``clitodo add "Do the dishes" todo``
   - Adds "Do this dishes" to your task list
   - ``add`` is the command, signifies this is a new task
-  - ``"Do this dishes"`` is the description, put the description in quotation marks
+  - ``"Do the dishes"`` is the description, put the description in quotation marks
   - ``<status>`` is optional, defaults to ``todo``
 
 ## Updating a task
