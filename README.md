@@ -1,4 +1,4 @@
-# [CLI ToDo -- A command line interface todo list](https://github.com/GriffEngel/CLI-ToDo-App)
+# CLI ToDo -- A command line interface todo list
 
 ## Adding a Task
 ### ``clitodo add <"description"> <status>``
@@ -25,3 +25,4 @@
 ``clitodo delete 1``
 - Deletes the task with task id ``1``
 
+[Project URL](https://github.com/GriffEngel/CLI-ToDo-App)
