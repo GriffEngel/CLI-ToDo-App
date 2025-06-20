@@ -25,5 +25,4 @@
 ``clitodo delete 1``
 - Deletes the task with task id ``1``
 
-#### Project URL
-[https://github.com/GriffEngel/CLI-ToDo-App](https://github.com/GriffEngel/CLI-ToDo-App)
+#### [Project URL](https://roadmap.sh/projects/task-tracker)
