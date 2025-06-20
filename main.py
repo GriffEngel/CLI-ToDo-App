@@ -1,61 +1,8 @@
 import json
-import argparse
 from datetime import datetime
 import os
 
-
-# argparse setup
-parser = argparse.ArgumentParser()
-
-# subparsers
-subparsers = parser.add_subparsers(dest="command")
-add_parser = subparsers.add_parser("add", help="Add new task")
-list_parser = subparsers.add_parser(
-    "list",
-    help="list tasks with the same status (todo, in-progress, done)",
-)
-delete_parser = subparsers.add_parser(
-    "delete", help="remove task from task list"
-)
-update_parser = subparsers.add_parser("update", help="Update a task")
-
-# add args
-add_parser.add_argument(
-    "description",
-    help="Enter the task you wish to track in quotes",
-    type=str,
-)
-add_parser.add_argument(
-    "status",
-    help="Are you not started, in-progress, or done with the task?",
-    default="todo",
-    nargs="?",
-    choices=("todo", "doing", "done"),
-)
-
-# list args
-list_parser.add_argument(
-    "status",
-    help="Choose which status you would like to see all the tasks for",
-    choices=("todo", "doing", "done", "all", "in-progress"),
-)
-
-# delete args
-delete_parser.add_argument(
-    "id", type=int, help="Task ID you would like to delete"
-)
-
-# update args
-update_parser.add_argument(
-    "update_id", type=int, help="Task ID you would like to update"
-)
-update_parser.add_argument(
-    "update_status",
-    help="What status you would like to change the task to",
-)
-
-# arguments
-args = parser.parse_args()
+from args import args
 
 
 # load tasks
@@ -86,89 +33,111 @@ def add_task():
     try:
         tasks = load_tasks()
 
-        task_id = max(task["id"] for task in tasks) + 1 if tasks else 1
+        task_id = max((task["id"] for task in tasks), default=0) + 1
 
-        task = {
-            "id": task_id,
-            "description": args.description,
-            "status": args.status,
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        }
-
-        tasks.append(task)
+        now = datetime.now().strftime("%m-%d-%Y %H:%M")
+        tasks.append(
+            {
+                "id": task_id,
+                "description": args.description,
+                "status": args.status,
+                "created_at": now,
+                "updated_at": now,
+            }
+        )
 
         save_file(tasks)
         print(f"Task added successfully (ID: {task_id})")
     except Exception as e:
-        print("The error is: ", e)
+        print(f"Error adding task: {e}")
 
 
-# list tasks
 def list_tasks(command):
     try:
         tasks = load_tasks()
-        print(f"{command}\n-------------------------")
+        # check for empty list
+        if not tasks:
+            print("No tasks found")
+            return
+
+        # print dividing line early
+        print(f"{command}\n" + "-" * 25)
+
+        # define the filtered list first, then print it
         if command == "all":
-            for task in tasks:
-                print(
-                    f"ID: {task['id']}, {task['description']}, Status: {task['status']}, {task['created_at']}"
-                )
+            filtered_tasks = tasks
         elif command == "in-progress":
-            for task in tasks:
-                if task["status"] == "todo" or task["status"] == "doing":
-                    print(
-                        f"ID: {task['id']}, {task['description']}, Status: {task['status']}, {task['created_at']}"
-                    )
-        for task in tasks:
-            if task["status"] == command:
-                print(
-                    f"ID: {task['id']}, Task: {task['description']}, {task['created_at']}"
-                )
+            filtered_tasks = [
+                t for t in tasks if t["status"] in ["todo", "doing"]
+            ]
+        else:
+            filtered_tasks = [t for t in tasks if t["status"] == command]
+
+        # one common print statement
+        for task in filtered_tasks:
+            print(
+                f"ID: {task['id']}, Task: {task['description']}, Status: {task['status']}, {task['updated_at']}"
+            )
+
+        # check if command has no filtered tasks
+        if not filtered_tasks:
+            print(f"No tasks found for {command}")
+
     except Exception as e:
-        print("The error is: ", e)
+        print(f"Error listing tasks: {e}")
 
 
 # delete task
 def delete_task(task_id):
     try:
         tasks = load_tasks()
-        for task in tasks:
+        # access both index and value so pop() is usable
+        for i, task in enumerate(tasks):
             if task["id"] == task_id:
-                tasks.remove(task)
-        save_file(tasks)
-        print(
-            f"Task ID: {task_id}, {task['description']} successfully deleted"
-        )
+                deleted_task = tasks.pop(i)
+                save_file(tasks)
+                print(
+                    f"Task ID: {task_id}, '{deleted_task['description']}' successfully deleted"
+                )
+                return
+        print(f"Task with ID {task_id} not found")
+
     except Exception as e:
-        print("The error is: ", e)
+        print(f"Error deleting task: {e}")
 
 
 # mark task as done or in progress
 def update_task(task_id, task_status):
-    tasks = load_tasks()
-    for task in tasks:
-        if task["id"] == task_id:
-            task["status"] = task_status
-            save_file(tasks)
-            print(
-                f"Task ID: {task_id}, '{task['description']}' successfully updated to '{task_status}'"
-            )
-    save_file(tasks)
+    try:
+        tasks = load_tasks()
+        for task in tasks:
+            if task["id"] == task_id:
+                task["status"] = task_status
+                task["updated_at"] = datetime.now().strftime("%m-%d-%Y %H:%M")
+                save_file(tasks)
+                print(
+                    f"Task ID: {task_id}, '{task['description']}' successfully updated to '{task_status}'"
+                )
+                return
+
+        print(f"Task with ID {task_id} not found.")
+    except Exception as e:
+        print(f"Error updating task: {e}")
 
 
 def main():
-    if args.command == "add" and args.description and args.status:
-        add_task()
-
-    if args.command == "list":
-        list_tasks(args.status)
-
-    if args.command == "delete":
-        delete_task(args.id)
-
-    if args.command == "update":
-        update_task(args.update_id, args.update_status)
+    commands = {
+        "add": lambda: add_task()
+        if args.description and args.status
+        else None,
+        "list": lambda: list_tasks(args.status),
+        "delete": lambda: delete_task(args.id),
+        "update": lambda: update_task(args.update_id, args.update_status),
+    }
+    if args.command in commands:
+        result = commands[command]()
+        if result is None and args.command == "add":
+            print("Description is required for adding tasks")
 
 
 if __name__ == "__main__":
