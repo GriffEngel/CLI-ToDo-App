@@ -26,4 +26,4 @@
 - Deletes the task with task id ``1``
 
 #### Project URL
-https://github.com/GriffEngel/CLI-ToDo-App](https://github.com/GriffEngel/CLI-ToDo-App)
+[https://github.com/GriffEngel/CLI-ToDo-App](https://github.com/GriffEngel/CLI-ToDo-App)
