@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-import os
 
 from args import args
 
