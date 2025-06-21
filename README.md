@@ -1,5 +1,9 @@
 # CLI ToDo -- A command line interface todo list
 
+# Installation
+```
+pip install git+https://github.com/GriffEngel/CLI-ToDo-App/tree/main
+```
 ## Adding a Task
 ### ``clitodo add <"description"> <status>``
   ``clitodo add "Do the dishes" todo``
